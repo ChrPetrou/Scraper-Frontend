@@ -30,22 +30,31 @@ const HeaderImg = styled.div`
 
 const HeaderContent = styled.div`
   display: flex;
+  gap: 20px;
   flex-direction: column;
   h1 {
-    font-size: 30px;
+    font-size: 38px;
     font-weight: 600;
+  }
+  h2 {
+    strong {
+      font-size: 38px;
+      font-weight: 600;
+    }
+    font-size: 20px;
+    font-weight: 300;
   }
 `;
 
 const ActiveSymbol = ({ activeSymbol }) => {
   const [rate, setRate] = useState();
   const [errosMsg, setErrosMsg] = useState();
-
+  const [updates, setUpdates] = useState([]);
   const getRate = async () => {
     try {
       const rateValue = await agent.getlatestRate(activeSymbol);
 
-      setRate(rateValue);
+      setRate(rateValue?.rate);
     } catch (err) {
       setErrosMsg(err);
     }
@@ -53,6 +62,28 @@ const ActiveSymbol = ({ activeSymbol }) => {
 
   useEffect(() => {
     if (activeSymbol) getRate();
+    const socket = new WebSocket("ws://localhost:4000");
+
+    socket.addEventListener("open", (event) => {
+      console.log("Connected to WebSocket");
+    });
+
+    socket.addEventListener("message", (event) => {
+      const message = JSON.parse(event.data);
+      console.log(activeSymbol);
+      if (message.type === "update" && activeSymbol) {
+        const { symbol, rate } = message.message;
+        console.log(message);
+
+        if (symbol == activeSymbol.symbol) {
+          setRate(rate);
+        }
+      }
+    });
+
+    return () => {
+      socket.close(); // Clean up the WebSocket connection when the component unmounts
+    };
   }, [activeSymbol]);
 
   return (
@@ -81,7 +112,12 @@ const ActiveSymbol = ({ activeSymbol }) => {
       </HeaderImg>
       <HeaderContent>
         <h1>{activeSymbol?.name}</h1>
-        <h2>{rate?.rate}</h2>
+        <h2>
+          <strong> {rate}</strong> {activeSymbol?.symbol?.slice(-3)}
+        </h2>
+        {/* {updates.map((update, index) => (
+          <p key={index}>{update.rate}</p>
+        ))} */}
       </HeaderContent>
     </Header>
   );
