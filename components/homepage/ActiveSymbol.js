@@ -76,6 +76,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
         console.log(message);
 
         if (symbol == activeSymbol.symbol) {
+          console.log(rate);
           setRate(rate);
         }
       }
