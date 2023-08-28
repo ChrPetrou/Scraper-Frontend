@@ -10,12 +10,12 @@ const agent = {
   },
   getlatestRate: async ({ symbol }) => {
     return agentAxios
-      .post("/symbols/latest-rate", symbol)
+      .post("/symbols/latest-rate", { symbol })
       .then((res) => res.data);
   },
   getProgessRate: async ({ symbol, dateFrom, dateTo }) => {
     return agentAxios
-      .post("/symbols/progess-rate", symbol)
+      .post("/symbols/progess-rate", { symbol })
       .then((res) => res.data);
   },
 };
