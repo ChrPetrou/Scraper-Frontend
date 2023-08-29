@@ -14,8 +14,9 @@ const agent = {
       .then((res) => res.data);
   },
   getProgessRate: async ({ symbol, dateFrom, dateTo }) => {
+    console.log({ symbol, dateFrom, dateTo });
     return agentAxios
-      .post("/symbols/progess-rate", { symbol })
+      .post("/symbols/progress-rate", { symbol, dateFrom, dateTo })
       .then((res) => res.data);
   },
 };
