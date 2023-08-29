@@ -112,7 +112,6 @@ const ActiveSymbol = ({ activeSymbol }) => {
   };
 
   const getProgressRate = async (symbol, dateStart, dateEnd) => {
-    console.log(symbol, dateStart, dateEnd);
     try {
       const progressRateValues = await agent.getProgessRate({
         symbol,
@@ -135,7 +134,9 @@ const ActiveSymbol = ({ activeSymbol }) => {
       getProgressRate(activeSymbol.symbol, 79200, dateInSecs);
       getRate();
     }
-    const socket = new WebSocket("ws://localhost:4000");
+    const socket = new WebSocket(
+      process.env.NEXT_PUBLIC_ENVIRONMENT_SOCKET_URL
+    );
 
     socket.addEventListener("open", (event) => {
       console.log("Connected to WebSocket");

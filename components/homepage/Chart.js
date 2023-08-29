@@ -3,7 +3,7 @@ import { InsideContainer } from "../common/MainContainer";
 import { Line } from "react-chartjs-2";
 
 const Chart = ({ progressData = [], activeSymbol }) => {
-  console.log("CHART", progressData);
+  // console.log("CHART", progressData);
   return (
     <InsideContainer>
       {" "}
@@ -15,7 +15,7 @@ const Chart = ({ progressData = [], activeSymbol }) => {
                 day: "numeric",
                 hour: "numeric",
                 minute: "numeric",
-                month: "long",
+                month: "numeric",
               })
             ),
             datasets: [

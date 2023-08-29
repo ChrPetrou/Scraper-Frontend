@@ -14,6 +14,8 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_ENVIRONMENT_URL: process.env.NEXT_PUBLIC_ENVIRONMENT_URL,
     NEXT_PAGE_URL: process.env.NEXT_PAGE_URL,
+    NEXT_PUBLIC_ENVIRONMENT_SOCKET_URL:
+      process.env.NEXT_PUBLIC_ENVIRONMENT_SOCKET_URL,
   },
   async headers() {
     return [
