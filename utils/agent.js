@@ -6,17 +6,21 @@ const agentAxios = axios.create({
 
 const agent = {
   getAllSymbols: async () => {
-    return await agentAxios.get("/symbols/all-symbols").then((res) => res.data);
+    return await agentAxios.get("/symbols").then((res) => res.data);
   },
   getlatestRate: async ({ symbol }) => {
     return agentAxios
-      .post("/symbols/latest-rate", { symbol })
+      .get("/rates/latest", {
+        params: {
+          symbol,
+        },
+      })
       .then((res) => res.data);
   },
   getProgessRate: async ({ symbol, dateFrom, dateTo }) => {
     console.log({ symbol, dateFrom, dateTo });
     return agentAxios
-      .post("/symbols/progress-rate", { symbol, dateFrom, dateTo })
+      .get("/rates/history", { params: { symbol, dateFrom, dateTo } })
       .then((res) => res.data);
   },
 };
