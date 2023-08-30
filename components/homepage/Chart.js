@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { InsideContainer } from "../common/MainContainer";
+import { InsideContainer, MainContainer } from "../common/MainContainer";
 import { Line } from "react-chartjs-2";
+import { scales } from "chart.js";
 
-const Chart = ({ progressData = [], activeSymbol }) => {
+const Chart = ({ progressData = [] }) => {
   // console.log("CHART", progressData);
   return (
-    <InsideContainer>
+    <MainContainer>
       {" "}
       {progressData?.length > 0 && (
         <Line
@@ -33,7 +34,7 @@ const Chart = ({ progressData = [], activeSymbol }) => {
           WTF
         </Line>
       )}
-    </InsideContainer>
+    </MainContainer>
   );
 };
 

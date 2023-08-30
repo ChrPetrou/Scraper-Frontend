@@ -17,7 +17,7 @@ const agent = {
       })
       .then((res) => res.data);
   },
-  getProgessRate: async ({ symbol, dateFrom, dateTo }) => {
+  getHistoryRate: async ({ symbol, dateFrom, dateTo }) => {
     console.log({ symbol, dateFrom, dateTo });
     return agentAxios
       .get("/rates/history", { params: { symbol, dateFrom, dateTo } })

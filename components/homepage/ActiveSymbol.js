@@ -18,8 +18,7 @@ import {
 } from "chart.js";
 import { array } from "yup";
 import Chart from "./Chart";
-import Example from "./Example";
-import LineChart from "./LineChart";
+
 ChartJS.register(
   Title,
   Tooltip,
@@ -66,6 +65,7 @@ const HeaderContent = styled.div`
   h2 {
     strong {
       font-size: 38px;
+      margin-right: 10px;
       font-weight: 600;
     }
     font-size: 20px;
@@ -113,7 +113,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
 
   const getProgressRate = async (symbol, dateStart, dateEnd) => {
     try {
-      const progressRateValues = await agent.getProgessRate({
+      const progressRateValues = await agent.getHistoryRate({
         symbol,
         dateFrom: dateStart,
         dateTo: dateEnd,
@@ -129,9 +129,19 @@ const ActiveSymbol = ({ activeSymbol }) => {
   useEffect(() => {
     console.log(activeSymbol);
     if (activeSymbol) {
-      let dateInMillisecs = Date.now();
-      let dateInSecs = Math.round(dateInMillisecs / 1000);
-      getProgressRate(activeSymbol.symbol, 79200, dateInSecs);
+      let dateNow = Date.now();
+      let dateNowInSecs = Math.round(dateNow / 1000);
+      //Get Start Of the Date
+      const specificDate = new Date(); // Get current date and time
+      // Set the time to 00:00:00
+      specificDate.setHours(0);
+      specificDate.setMinutes(0);
+      specificDate.setSeconds(0);
+      specificDate.setMilliseconds(0);
+      const startOfDayMilliseconds = specificDate.getTime();
+      const startOfDaySeconds = Math.floor(startOfDayMilliseconds / 1000);
+      console.log(startOfDaySeconds, dateNowInSecs);
+      getProgressRate(activeSymbol.symbol, startOfDaySeconds, dateNowInSecs);
       getRate();
     }
     const socket = new WebSocket(
@@ -160,9 +170,8 @@ const ActiveSymbol = ({ activeSymbol }) => {
               month: "long",
             }),
           });
+
           setProggressRate((current) => [...current, message.message]);
-          const prograte = [];
-          const count = prograte.push(rate);
         }
       }
     });
@@ -208,16 +217,14 @@ const ActiveSymbol = ({ activeSymbol }) => {
       </Header>
       <GraphContainer>
         <h1>{activeSymbol?.symbol} chart</h1>
-        <Chart
-          progressData={progressRate
-            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
-            .slice(-100)}
-          activeSymbol={activeSymbol}
-          previousRate={previousRate}
-        />
+        <p>{progressRate?.length}</p>
+        {/* <Chart
+          progressData={progressRate.sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          )}
+        /> */}
+        <Chart progressData={progressRate} />
       </GraphContainer>
-      {/* <p>{progressRate.map((element) => element.rate)}</p> */}
-      {/* <LineChart chartData={data} /> */}
     </InsideContainer>
   );
 };
