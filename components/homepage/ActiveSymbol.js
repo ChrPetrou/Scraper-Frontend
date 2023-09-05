@@ -99,12 +99,12 @@ const ActiveSymbol = ({ activeSymbol }) => {
       const rateValue = await agent.getlatestRate(activeSymbol);
       setRate({
         rate: rateValue?.rate,
-        created_at: new Date(rateValue?.createdAt).toLocaleString("en-US", {
+        created_at: Intl.DateTimeFormat("en-US", {
           day: "numeric",
           hour: "numeric",
           minute: "numeric",
           month: "long",
-        }),
+        }).format(new Date(data?.createdAt)),
       });
     } catch (err) {
       setErrosMsg(err);
@@ -163,12 +163,12 @@ const ActiveSymbol = ({ activeSymbol }) => {
 
           setRate({
             rate: rate,
-            created_at: new Date(createdAt).toLocaleString("en-US", {
+            created_at: Intl.DateTimeFormat("en-US", {
               day: "numeric",
               hour: "numeric",
               minute: "numeric",
               month: "long",
-            }),
+            }).format(new Date(createdAt)),
           });
 
           setProggressRate((current) => [...current, message.message]);
