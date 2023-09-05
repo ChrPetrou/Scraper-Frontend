@@ -30,6 +30,7 @@ const Chart = ({ progressData = [] }) => {
                 backgroundColor: "lightGreen",
                 borderColor: "green",
                 pointRadius: 0,
+                hoverRadius: 5,
                 onHover: (event, chartElement) => {
                   event.target.style.cursor = chartElement[0]
                     ? "crosshair"
@@ -37,7 +38,7 @@ const Chart = ({ progressData = [] }) => {
                   // updatePointRadius(event, chartElement);
                 },
                 fill: true,
-                pointBackgroundColor: "transparent",
+                pointBackgroundColor: "red",
                 clip: true,
               },
             ],
