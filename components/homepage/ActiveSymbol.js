@@ -130,7 +130,6 @@ const ActiveSymbol = ({ activeSymbol }) => {
   };
 
   useEffect(() => {
-    // console.log(activeSymbol);
     if (activeSymbol) {
       let dateNow = Date.now();
       let dateNowInSecs = Math.round(dateNow / 1000);
@@ -138,7 +137,6 @@ const ActiveSymbol = ({ activeSymbol }) => {
       let specificDate = new Date();
       switch (timeline) {
         case "Today":
-          console.log("Oranges are $0.59 a pound.");
           specificDate.setHours(0);
           specificDate.setMinutes(0);
           specificDate.setSeconds(0);
@@ -151,28 +149,23 @@ const ActiveSymbol = ({ activeSymbol }) => {
           specificDate = new Date(
             specificDate.getTime() - 7 * 24 * 60 * 60 * 1000
           );
-
           break;
         case "1 month":
           specificDate.setMonth(specificDate.getMonth() - 1);
-          console.log("Mangoes and papayas are $2.79 a pound.");
-
           break;
         case "6 months":
           specificDate.setMonth(specificDate.getMonth() - 6);
-          console.log("Oranges are $0.59 a pound.");
           break;
         case "Year to date":
           //from the start of the year
-          console.log("Oranges are $0.59 a pound.");
+
+          specificDate = new Date(specificDate.getFullYear(), 0, 1);
           break;
         case "1 year":
           specificDate.setFullYear(specificDate.getFullYear() - 1);
-          console.log("Oranges are $0.59 a pound.");
           break;
         case "5 years":
           specificDate.setFullYear(specificDate.getFullYear() - 5);
-          console.log("Oranges are $0.59 a pound.");
           break;
         case "All time":
           specificDate = new Date(0);
@@ -187,6 +180,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
       }
       //to seconds
       specificDate = Math.floor(specificDate / 1000);
+      console.log(specificDate);
       getProgressRate(activeSymbol.symbol, specificDate, dateNowInSecs);
       getRate();
     }
