@@ -18,9 +18,13 @@ const agent = {
       .then((res) => res.data);
   },
   getHistoryRate: async ({ symbol, dateFrom, dateTo }) => {
-    console.log({ symbol, dateFrom, dateTo });
     return agentAxios
       .get("/rates/history", { params: { symbol, dateFrom, dateTo } })
+      .then((res) => res.data);
+  },
+  getPerformance: async ({ symbol }) => {
+    return agentAxios
+      .get("/performance", { params: { symbol } })
       .then((res) => res.data);
   },
 };

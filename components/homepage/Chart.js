@@ -1,16 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { InsideContainer, MainContainer } from "../common/MainContainer";
 import { Line } from "react-chartjs-2";
+import "chartjs-plugin-annotation"; // Import the annotation plugin
+import colors from "@/config/colors";
 
 const Chart = ({ progressData = [] }) => {
   useEffect(() => {}, [progressData]);
+  const [activeIndex, setActiveIndex] = useState();
+
+  // Index of the point where you want to draw the vertical line
+  const verticalLineIndex = progressData.length - 1;
+
+  // Define the annotation configuration for the vertical line
+  const annotation = {
+    type: "line",
+    mode: "vertical",
+    scaleID: "x", // Use the x-axis scale
+    value: progressData[verticalLineIndex]?.createdAt, // X-coordinate corresponding to the data point
+    borderColor: "red", // Customize the line color
+    borderWidth: 2, // Customize the line width
+    label: {
+      content: "Vertical Line",
+      enabled: true,
+      position: "top",
+    },
+  };
 
   return (
     <MainContainer>
-      {" "}
       {progressData?.length > 0 && (
         <Line
-          style={{ borderTop: "1px solid gray", paddingTop: "20px" }}
+          style={{
+            borderTop: "1px solid gray",
+            paddingTop: "10px",
+            height: "400px",
+          }}
           data={{
             labels: progressData?.map((data) => {
               const now = new Date(data?.createdAt);
@@ -25,21 +49,25 @@ const Chart = ({ progressData = [] }) => {
             }),
             datasets: [
               {
+                animation: "none",
                 label: "",
                 data: progressData?.map((data) => data?.rate),
-                backgroundColor: "lightGreen",
-                borderColor: "green",
-                pointRadius: 0,
-                hoverRadius: 5,
-                onHover: (event, chartElement) => {
-                  event.target.style.cursor = chartElement[0]
-                    ? "crosshair"
-                    : "default";
-                  // updatePointRadius(event, chartElement);
-                },
+                backgroundColor: colors.mint,
+                borderColor: colors.green,
+                // borderWidth: 1,
+                pointRadius: (index) =>
+                  index.dataIndex === activeIndex
+                    ? 5
+                    : index.dataIndex === verticalLineIndex
+                    ? 4
+                    : 0,
+                hoverRadius: (index) =>
+                  index.dataIndex === verticalLineIndex ? 10 : undefined,
                 fill: true,
-                pointBackgroundColor: "red",
+                pointBackgroundColor: "green",
+                pointBorderColor: "white",
                 clip: true,
+                animations: false,
               },
             ],
           }}
@@ -50,12 +78,12 @@ const Chart = ({ progressData = [] }) => {
                   maxTicksLimit: 10,
                 },
                 grid: {
-                  display: false, // Hide x-axis gridlines
+                  display: false,
                 },
               },
               y: {
                 grid: {
-                  display: false, // Hide x-axis gridlines
+                  display: false,
                 },
               },
             },
@@ -63,20 +91,19 @@ const Chart = ({ progressData = [] }) => {
               legend: {
                 display: false,
               },
-
               tooltip: {
-                mode: "index", // Set the tooltip mode to "nearest"
+                mode: "index",
                 intersect: false,
                 callbacks: {
                   label: function (context) {
-                    return context.dataset.label + ": " + context.parsed.y;
+                    setActiveIndex(context.dataIndex);
+                    return context.parsed.y;
                   },
                 },
               },
-              onHover: (event, chartElement) => {
-                event.target.style.cursor = chartElement[0]
-                  ? "crosshair"
-                  : "default";
+
+              annotation: {
+                annotations: [annotation], // Add the annotation to the chart
               },
             },
             maintainAspectRatio: false,

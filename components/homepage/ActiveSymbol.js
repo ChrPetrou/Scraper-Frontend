@@ -16,8 +16,9 @@ import {
   PointElement,
   Filler,
 } from "chart.js";
-import { array } from "yup";
+
 import Chart from "./Chart";
+import Performance from "./Performance";
 
 ChartJS.register(
   Title,
@@ -35,6 +36,7 @@ const Header = styled.div`
   margin-top: 20px;
   gap: 30px;
   width: 100%;
+  margin-left: 40px;
 `;
 
 const HeaderImg = styled.div`
@@ -88,6 +90,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
     rate: activeSymbol?.rate,
     created_at: activeSymbol?.createdAt,
   });
+  const [timeline, setTimeline] = useState("Today");
   const [previousRate, setPreviousRate] = useState();
   const [progressRate, setProggressRate] = useState([]);
 
@@ -118,7 +121,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
         dateFrom: dateStart,
         dateTo: dateEnd,
       });
-      console.log(progressRateValues);
+      // console.log(progressRateValues);
 
       setProggressRate(progressRateValues);
     } catch (err) {
@@ -127,21 +130,64 @@ const ActiveSymbol = ({ activeSymbol }) => {
   };
 
   useEffect(() => {
-    console.log(activeSymbol);
+    // console.log(activeSymbol);
     if (activeSymbol) {
       let dateNow = Date.now();
       let dateNowInSecs = Math.round(dateNow / 1000);
       //Get Start Of the Date
-      const specificDate = new Date(); // Get current date and time
-      // Set the time to 00:00:00
-      specificDate.setHours(0);
-      specificDate.setMinutes(0);
-      specificDate.setSeconds(0);
-      specificDate.setMilliseconds(0);
-      const startOfDayMilliseconds = specificDate.getTime();
-      const startOfDaySeconds = Math.floor(startOfDayMilliseconds / 1000);
-      console.log(startOfDaySeconds, dateNowInSecs);
-      getProgressRate(activeSymbol.symbol, startOfDaySeconds, dateNowInSecs);
+      let specificDate = new Date();
+      switch (timeline) {
+        case "Today":
+          console.log("Oranges are $0.59 a pound.");
+          specificDate.setHours(0);
+          specificDate.setMinutes(0);
+          specificDate.setSeconds(0);
+          specificDate.setMilliseconds(0);
+          specificDate = specificDate.getTime();
+          //to seconds
+
+          break;
+        case "Week":
+          specificDate = new Date(
+            specificDate.getTime() - 7 * 24 * 60 * 60 * 1000
+          );
+
+          break;
+        case "1 month":
+          specificDate.setMonth(specificDate.getMonth() - 1);
+          console.log("Mangoes and papayas are $2.79 a pound.");
+
+          break;
+        case "6 months":
+          specificDate.setMonth(specificDate.getMonth() - 6);
+          console.log("Oranges are $0.59 a pound.");
+          break;
+        case "Year to date":
+          //from the start of the year
+          console.log("Oranges are $0.59 a pound.");
+          break;
+        case "1 year":
+          specificDate.setFullYear(specificDate.getFullYear() - 1);
+          console.log("Oranges are $0.59 a pound.");
+          break;
+        case "5 years":
+          specificDate.setFullYear(specificDate.getFullYear() - 5);
+          console.log("Oranges are $0.59 a pound.");
+          break;
+        case "All time":
+          specificDate = new Date(0);
+          break;
+        default:
+          specificDate = new Date();
+          specificDate.setHours(0);
+          specificDate.setMinutes(0);
+          specificDate.setSeconds(0);
+          specificDate.setMilliseconds(0);
+          break;
+      }
+      //to seconds
+      specificDate = Math.floor(specificDate / 1000);
+      getProgressRate(activeSymbol.symbol, specificDate, dateNowInSecs);
       getRate();
     }
     const socket = new WebSocket(
@@ -179,7 +225,7 @@ const ActiveSymbol = ({ activeSymbol }) => {
     return () => {
       socket.close(); // Clean up the WebSocket connection when the component unmounts
     };
-  }, [activeSymbol]);
+  }, [activeSymbol, timeline]);
 
   return (
     <InsideContainer>
@@ -218,12 +264,19 @@ const ActiveSymbol = ({ activeSymbol }) => {
       <GraphContainer>
         <h1>{activeSymbol?.symbol} chart</h1>
         <p>{progressRate?.length}</p>
+        <p>{timeline}</p>
         {/* <Chart
           progressData={progressRate.sort(
             (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
           )}
         /> */}
+
         <Chart progressData={progressRate} />
+        <Performance
+          activeSymbol={activeSymbol?.symbol}
+          timeline={timeline}
+          setTimeline={setTimeline}
+        />
       </GraphContainer>
     </InsideContainer>
   );

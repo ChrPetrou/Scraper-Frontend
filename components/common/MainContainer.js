@@ -17,7 +17,7 @@ const ContainerInner = styled.div`
   display: flex;
   margin: auto;
   flex-direction: column;
-  max-width: 1200px;
+  max-width: 1400px;
   gap: 20px;
   background-color: ${({ bgClr }) => bgClr};
   width: 100%;
