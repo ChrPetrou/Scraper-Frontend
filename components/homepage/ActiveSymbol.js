@@ -4,7 +4,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { styled } from "styled-components";
 import { InsideContainer } from "../common/MainContainer";
-
+import Loader from "../../public/animations/Loader.json";
 import {
   Chart as ChartJS,
   Title,
@@ -19,6 +19,7 @@ import {
 
 import Chart from "./Chart";
 import Performance from "./Performance";
+import Lottie from "../common/Lottie";
 
 ChartJS.register(
   Title,
@@ -33,26 +34,40 @@ ChartJS.register(
 
 const Header = styled.div`
   display: flex;
+  flex-wrap: wrap;
   margin-top: 20px;
   gap: 30px;
   width: 100%;
-  margin-left: 40px;
+  /* margin-left: 40px; */
 `;
 
 const HeaderImg = styled.div`
   position: relative;
-  & img {
-  }
+  display: flex;
+
   & :first-child {
     clip-path: path("M113 0H0V48c35-1 60 20 62 66v0h48V0Z");
     border-radius: 50%;
+    width: 100%;
+    object-fit: contain;
   }
   & :last-child {
     position: absolute;
     right: 0;
+    width: 100%;
+    object-fit: contain;
     top: 0;
     border-radius: 50%;
     transform: translate(-45px, 55px);
+  }
+  @media only screen and (max-width: 685px) {
+    & :first-child {
+      clip-path: none;
+    }
+    & :last-child {
+      position: relative;
+      transform: translate(-45px, 0px);
+    }
   }
 `;
 
@@ -85,6 +100,12 @@ const GraphContainer = styled.div`
   }
 `;
 
+const LoaderWrap = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+`;
+
 const ActiveSymbol = ({ activeSymbol }) => {
   const [rate, setRate] = useState({
     rate: activeSymbol?.rate,
@@ -92,12 +113,14 @@ const ActiveSymbol = ({ activeSymbol }) => {
   });
   const [timeline, setTimeline] = useState("Today");
   const [previousRate, setPreviousRate] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const [progressRate, setProggressRate] = useState([]);
 
   const [errosMsg, setErrosMsg] = useState();
 
   //get current rate of symbol
   const getRate = async () => {
+    setIsLoading(true);
     try {
       const rateValue = await agent.getlatestRate(activeSymbol);
       setRate({
@@ -109,22 +132,26 @@ const ActiveSymbol = ({ activeSymbol }) => {
           month: "long",
         }).format(new Date(data?.createdAt)),
       });
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setErrosMsg(err);
     }
   };
 
   const getProgressRate = async (symbol, dateStart, dateEnd) => {
+    setIsLoading(true);
     try {
       const progressRateValues = await agent.getHistoryRate({
         symbol,
         dateFrom: dateStart,
         dateTo: dateEnd,
       });
-      // console.log(progressRateValues);
 
       setProggressRate(progressRateValues);
+      setIsLoading(false);
     } catch (err) {
+      setIsLoading(false);
       setErrosMsg(err);
     }
   };
@@ -158,7 +185,6 @@ const ActiveSymbol = ({ activeSymbol }) => {
           break;
         case "Year to date":
           //from the start of the year
-
           specificDate = new Date(specificDate.getFullYear(), 0, 1);
           break;
         case "1 year":
@@ -180,7 +206,6 @@ const ActiveSymbol = ({ activeSymbol }) => {
       }
       //to seconds
       specificDate = Math.floor(specificDate / 1000);
-      console.log(specificDate);
       getProgressRate(activeSymbol.symbol, specificDate, dateNowInSecs);
       getRate();
     }
@@ -210,8 +235,14 @@ const ActiveSymbol = ({ activeSymbol }) => {
               month: "long",
             }).format(new Date(createdAt)),
           });
-
-          setProggressRate((current) => [...current, message.message]);
+          if (progressRate?.length < 1000) {
+            setProggressRate((current) => [...current, message.message]);
+          } else {
+            setProggressRate((current) => [
+              ...current.slice(1),
+              message.message,
+            ]);
+          }
         }
       }
     });
@@ -257,20 +288,30 @@ const ActiveSymbol = ({ activeSymbol }) => {
       </Header>
       <GraphContainer>
         <h1>{activeSymbol?.symbol} chart</h1>
-        <p>{progressRate?.length}</p>
-        <p>{timeline}</p>
-        {/* <Chart
-          progressData={progressRate.sort(
-            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
-          )}
-        /> */}
 
-        <Chart progressData={progressRate} />
-        <Performance
-          activeSymbol={activeSymbol?.symbol}
-          timeline={timeline}
-          setTimeline={setTimeline}
-        />
+        {isLoading ? (
+          <LoaderWrap>
+            <Lottie
+              animationData={Loader}
+              loop={true}
+              autoPlay={true}
+              style={{
+                margin: 0,
+                height: 150,
+                width: 150,
+              }}
+            />
+          </LoaderWrap>
+        ) : (
+          <>
+            <Chart progressData={progressRate} />
+            <Performance
+              activeSymbol={activeSymbol?.symbol}
+              timeline={timeline}
+              setTimeline={setTimeline}
+            />
+          </>
+        )}
       </GraphContainer>
     </InsideContainer>
   );

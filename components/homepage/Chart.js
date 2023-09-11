@@ -5,7 +5,6 @@ import "chartjs-plugin-annotation"; // Import the annotation plugin
 import colors from "@/config/colors";
 
 const Chart = ({ progressData = [] }) => {
-  useEffect(() => {}, [progressData]);
   const [activeIndex, setActiveIndex] = useState();
 
   // Index of the point where you want to draw the vertical line
